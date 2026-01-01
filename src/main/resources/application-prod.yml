@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://prod-host:5432/flowmanage_db
+    username: flowmanage_user
+    password: ${DB_PASSWORD}
+
+logging:
+  level:
+    root: WARN
+    com.flowmanage: INFO
+
+server:
+  error:
+    include-stacktrace: never
