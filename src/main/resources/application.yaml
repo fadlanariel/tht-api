@@ -8,8 +8,8 @@ spring:
 
   datasource:
     url: jdbc:postgresql://localhost:5432/flowmanage_db
-    username: flowmanage_user
-    password: flowmanage
+    username: postgres
+    password: postgres
     
   jpa:
     hibernate:
