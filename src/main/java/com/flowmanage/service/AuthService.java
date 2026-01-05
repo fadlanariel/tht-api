@@ -5,6 +5,7 @@ import com.flowmanage.dto.request.RegisterRequest;
 import com.flowmanage.entity.User;
 import com.flowmanage.repository.UserRepository;
 import com.flowmanage.security.JwtService;
+import com.flowmanage.dto.response.LoginResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -21,6 +22,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final RefreshTokenService refreshTokenService;
 
     public void register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
@@ -38,7 +40,7 @@ public class AuthService {
         userRepository.save(user);
     }
 
-    public String login(LoginRequest request) {
+    public LoginResponse login(LoginRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() ->
                     new BadCredentialsException("Invalid email or password")
@@ -48,6 +50,10 @@ public class AuthService {
             throw new BadCredentialsException("Invalid email or password");
         }
 
-        return jwtService.generateToken(user.getId(), user.getEmail());
+        String accessToken = jwtService.generateToken(user.getId(), user.getEmail());
+
+        String refreshToken = refreshTokenService.createRefreshToken(user.getId());
+
+        return new LoginResponse(accessToken, refreshToken);
     }
 }
