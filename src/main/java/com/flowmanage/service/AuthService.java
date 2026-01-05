@@ -3,6 +3,7 @@ package com.flowmanage.service;
 import com.flowmanage.dto.request.LoginRequest;
 import com.flowmanage.dto.request.RegisterRequest;
 import com.flowmanage.entity.User;
+import com.flowmanage.exception.BadRequestException;
 import com.flowmanage.repository.UserRepository;
 import com.flowmanage.security.JwtService;
 import com.flowmanage.dto.response.LoginResponse;
@@ -26,9 +27,7 @@ public class AuthService {
 
     public void register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
-                    "Email already registered");
+            throw new BadRequestException("Email already registered");
         }
 
         User user = User.builder()
@@ -43,11 +42,11 @@ public class AuthService {
     public LoginResponse login(LoginRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() ->
-                    new BadCredentialsException("Invalid email or password")
+                    new BadRequestException("Invalid email or password")
                 );
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new BadCredentialsException("Invalid email or password");
+            throw new BadRequestException("Invalid email or password");
         }
 
         String accessToken = jwtService.generateToken(user.getId(), user.getEmail());
