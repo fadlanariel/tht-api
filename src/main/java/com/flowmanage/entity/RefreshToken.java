@@ -21,6 +21,9 @@ public class RefreshToken {
     @Column(name = "user_id", nullable = false)
     private UUID userId;
 
+    @Column(nullable = false)
+    private String email;
+
     @Column(name = "token_hash", nullable = false)
     private String tokenHash;
 

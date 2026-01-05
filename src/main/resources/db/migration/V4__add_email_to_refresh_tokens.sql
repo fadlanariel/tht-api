@@ -1,0 +1,2 @@
+ALTER TABLE refresh_tokens
+ADD COLUMN email VARCHAR(255) NOT NULL;
