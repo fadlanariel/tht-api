@@ -52,6 +52,36 @@ public class GlobalExceptionHandler {
                 return ResponseEntity.badRequest().body(response);
         }
 
+        @ExceptionHandler(ProjectNotFoundException.class)
+        public ResponseEntity<ApiErrorResponse> handleProjectNotFound(
+                ProjectNotFoundException ex,
+                HttpServletRequest request
+        ) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new ApiErrorResponse(
+                                404,
+                                "PROJECT_NOT_FOUND",
+                                ex.getMessage(),
+                                request.getRequestURI(),
+                                null
+                        ));
+        }
+
+        @ExceptionHandler(ProjectForbiddenException.class)
+        public ResponseEntity<ApiErrorResponse> handleProjectForbidden(
+                ProjectForbiddenException ex,
+                HttpServletRequest request
+        ) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(new ApiErrorResponse(
+                                403,
+                                "PROJECT_FORBIDDEN",
+                                ex.getMessage(),
+                                request.getRequestURI(),
+                                null
+                        ));
+        }
+
         // Optional: last safety net (JANGAN expose detail)
         @ExceptionHandler(Exception.class)
         public ResponseEntity<ApiErrorResponse> handleGenericException(
