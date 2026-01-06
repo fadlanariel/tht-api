@@ -1,5 +1,6 @@
 package com.flowmanage.service;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
@@ -30,6 +31,11 @@ public class ProjectService {
                 });
     }
 
+    @Transactional(readOnly = true)
+    public List<Project> getMyProjects(UUID userId) {
+        return projectRepository.findAllByOwnerId(userId);
+    }
+
     @Transactional
     public Project createProject(
         UUID ownerId,
@@ -43,4 +49,30 @@ public class ProjectService {
         
         return projectRepository.save(project);
     }
+
+    @Transactional
+    public Project updateProject(
+            UUID projectId,
+            UUID userId,
+            String name,
+            String description) {
+        Project project = getProjectById(projectId, userId);
+
+        if (name != null) {
+            project.setName(name);
+        }
+
+        if (description != null) {
+            project.setDescription(description);
+        }
+
+        return projectRepository.save(project);
+    }
+
+    @Transactional
+    public void deleteProject(UUID projectId, UUID userId) {
+        Project project = getProjectById(projectId, userId);
+        projectRepository.delete(project);
+    }
+
 }

@@ -1,12 +1,15 @@
 package com.flowmanage.controller;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import com.flowmanage.dto.request.CreateProjectRequest;
+import com.flowmanage.dto.request.UpdateProjectRequest;
 import com.flowmanage.dto.response.ProjectResponse;
 import com.flowmanage.entity.Project;
 import com.flowmanage.security.AuthenticatedUser;
@@ -36,6 +39,16 @@ public class ProjectController {
         return ResponseEntity.ok(project);
     }
 
+    @GetMapping
+    public List<ProjectResponse> getMyProjects(
+        @AuthenticationPrincipal AuthenticatedUser user
+    ) {
+        return projectService.getMyProjects(user.getId())
+            .stream()
+            .map(ProjectResponse::from)
+            .toList();
+    }
+
     @PostMapping
     public ResponseEntity<ProjectResponse> createProject(
         @Valid @RequestBody CreateProjectRequest request
@@ -55,4 +68,29 @@ public class ProjectController {
                     project.getDescription()
             ));
     }        
+
+    @PatchMapping("/{projectId}")
+    public ProjectResponse updateProject(
+            @PathVariable UUID projectId,
+            @Valid @RequestBody UpdateProjectRequest request,
+            @AuthenticationPrincipal AuthenticatedUser user
+    ) {
+        Project project = projectService.updateProject(
+                projectId,
+                user.getId(),
+                request.getName(),
+                request.getDescription()
+        );
+
+        return ProjectResponse.from(project);
+    }
+
+    @DeleteMapping("/{projectId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteProject(
+            @PathVariable UUID projectId,
+            @AuthenticationPrincipal AuthenticatedUser user) {
+        projectService.deleteProject(projectId, user.getId());
+    }
+
 }
