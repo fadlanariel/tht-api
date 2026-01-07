@@ -11,4 +11,6 @@ import com.flowmanage.entity.Project;
 public interface ProjectRepository extends JpaRepository<Project, UUID> {
     List<Project> findAllByOwnerId(UUID ownerId);
     Optional<Project> findByIdAndOwnerId(UUID id, UUID ownerId);
+
+    boolean existsByIdAndOwnerId(UUID id, UUID ownerId);
 }
