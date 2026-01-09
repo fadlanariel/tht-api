@@ -5,6 +5,9 @@ CREATE TABLE IF NOT EXISTS users (
     id BIGSERIAL PRIMARY KEY,
     email VARCHAR(100) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    profile_image VARCHAR(255),
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -44,3 +47,38 @@ CREATE TABLE IF NOT EXISTS transactions (
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 CREATE INDEX IF NOT EXISTS idx_transactions_user_id ON transactions(user_id);
 CREATE INDEX IF NOT EXISTS idx_transactions_created_at ON transactions(created_at);
+
+-- ===============================
+-- BANNERS
+-- ===============================
+CREATE TABLE IF NOT EXISTS banners (
+    id BIGSERIAL PRIMARY KEY,
+    banner_name VARCHAR(100) NOT NULL UNIQUE,
+    banner_image VARCHAR(255) NOT NULL,
+    description VARCHAR(255)
+);
+
+-- Insert default banners jika belum ada
+INSERT INTO banners (banner_name, banner_image, description)
+VALUES ('Banner 1', 'https://nutech-integrasi.app/dummy.jpg', 'Lerem Ipsum Dolor sit amet')
+ON CONFLICT (banner_name) DO NOTHING;
+
+INSERT INTO banners (banner_name, banner_image, description)
+VALUES ('Banner 2', 'https://nutech-integrasi.app/dummy.jpg', 'Lerem Ipsum Dolor sit amet')
+ON CONFLICT (banner_name) DO NOTHING;
+
+INSERT INTO banners (banner_name, banner_image, description)
+VALUES ('Banner 3', 'https://nutech-integrasi.app/dummy.jpg', 'Lerem Ipsum Dolor sit amet')
+ON CONFLICT (banner_name) DO NOTHING;
+
+INSERT INTO banners (banner_name, banner_image, description)
+VALUES ('Banner 4', 'https://nutech-integrasi.app/dummy.jpg', 'Lerem Ipsum Dolor sit amet')
+ON CONFLICT (banner_name) DO NOTHING;
+
+INSERT INTO banners (banner_name, banner_image, description)
+VALUES ('Banner 5', 'https://nutech-integrasi.app/dummy.jpg', 'Lerem Ipsum Dolor sit amet')
+ON CONFLICT (banner_name) DO NOTHING;
+
+INSERT INTO banners (banner_name, banner_image, description)
+VALUES ('Banner 6', 'https://nutech-integrasi.app/dummy.jpg', 'Lerem Ipsum Dolor sit amet')
+ON CONFLICT (banner_name) DO NOTHING;
