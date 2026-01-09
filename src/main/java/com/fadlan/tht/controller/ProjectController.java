@@ -1,0 +1,119 @@
+package com.fadlan.tht.controller;
+
+import java.util.UUID;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+
+import com.fadlan.tht.common.PageableUtil;
+import com.fadlan.tht.common.PaginationConstants;
+import com.fadlan.tht.dto.request.CreateProjectRequest;
+import com.fadlan.tht.dto.request.UpdateProjectRequest;
+import com.fadlan.tht.dto.response.ApiResponse;
+import com.fadlan.tht.dto.response.PagedResponse;
+import com.fadlan.tht.dto.response.ProjectResponse;
+import com.fadlan.tht.entity.Project;
+import com.fadlan.tht.security.AuthenticatedUser;
+import com.fadlan.tht.security.SecurityUtils;
+import com.fadlan.tht.service.ProjectService;
+
+import org.springframework.data.domain.Sort;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+
+@Tag(name = "Projects")
+@RestController
+@RequestMapping("/api/projects")
+public class ProjectController {
+    private final ProjectService projectService;
+
+    public ProjectController(ProjectService projectService) {
+        this.projectService = projectService;
+    }
+
+    @Operation(summary = "Get project by ID")
+    @GetMapping("/{id}")
+    public ResponseEntity<Project> getProjectById(@PathVariable UUID id) {
+        AuthenticatedUser user = SecurityUtils.getCurrentUser();
+
+        Project project = projectService.getProjectById(
+            id, 
+            user.getId()
+        );
+
+        return ResponseEntity.ok(project);
+    }
+
+    @Operation(summary = "Get paginated list of users projects")
+    @GetMapping
+    public ApiResponse<PagedResponse<ProjectResponse>> getMyProjects(
+        Pageable pageable,
+        @AuthenticationPrincipal AuthenticatedUser user
+    ) {
+        Pageable sanitized = PageableUtil.sanitize(
+                pageable,
+                PaginationConstants.DEFAULT_SORT_FIELD,
+                Sort.Direction.DESC,
+                PaginationConstants.PROJECT_SORT_FIELDS);
+
+        Page<ProjectResponse> page = projectService.getMyProjects(user.getId(), sanitized)
+                .map(ProjectResponse::from);
+
+        return new ApiResponse<>(
+                PagedResponse.from(page));
+    }
+
+    @Operation(summary = "Create a new project")
+    @PostMapping
+    public ResponseEntity<ProjectResponse> createProject(
+        @Valid @RequestBody CreateProjectRequest request
+    ) {
+        AuthenticatedUser user = SecurityUtils.getCurrentUser();
+
+        Project project = projectService.createProject(
+            user.getId(),
+            request.name(),
+            request.description()
+        );
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .body(new ProjectResponse(
+                    project.getId(),
+                    project.getName(),
+                    project.getDescription()
+            ));
+    }        
+
+    @Operation(summary = "Update an existing project")
+    @PatchMapping("/{projectId}")
+    public ProjectResponse updateProject(
+            @PathVariable UUID projectId,
+            @Valid @RequestBody UpdateProjectRequest request,
+            @AuthenticationPrincipal AuthenticatedUser user
+    ) {
+        Project project = projectService.updateProject(
+                projectId,
+                user.getId(),
+                request.getName(),
+                request.getDescription()
+        );
+
+        return ProjectResponse.from(project);
+    }
+
+    @Operation(summary = "Delete a project")
+    @DeleteMapping("/{projectId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteProject(
+            @PathVariable UUID projectId,
+            @AuthenticationPrincipal AuthenticatedUser user) {
+        projectService.deleteProject(projectId, user.getId());
+    }
+
+}

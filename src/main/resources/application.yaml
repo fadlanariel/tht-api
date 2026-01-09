@@ -1,13 +1,13 @@
 spring:
   application:
-    name: flowmanage
+    name: tht-api
 
   spring:
     profiles:
       active: dev
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/flowmanage_db
+    url: jdbc:postgresql://localhost:5432/tht_db
     username: postgres
     password: postgres
     
@@ -26,7 +26,7 @@ jwt:
 logging:
   level:
     root: INFO
-    com.flowmanage: DEBUG
+    com.fadlan.tht: DEBUG
 
 server:
   error:
