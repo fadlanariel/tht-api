@@ -1,15 +1,27 @@
 package com.fadlan.tht.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
 
-import com.fadlan.tht.entity.User;
+@Repository
+@RequiredArgsConstructor
+public class UserRepository {
 
-import java.util.Optional;
-import java.util.UUID;
+    private final JdbcTemplate jdbcTemplate;
 
-public interface UserRepository extends JpaRepository<User, UUID> {
+    public void save(String email, String passwordHash) {
+        String sql = """
+                    INSERT INTO users (email, password)
+                    VALUES (?, ?)
+                """;
 
-    Optional<User> findByEmail(String email);
+        jdbcTemplate.update(sql, email, passwordHash);
+    }
 
-    boolean existsByEmail(String email);
+    public boolean existsByEmail(String email) {
+        String sql = "SELECT COUNT(*) FROM users WHERE email = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, email);
+        return count != null && count > 0;
+    }
 }
