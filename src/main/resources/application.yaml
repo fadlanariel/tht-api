@@ -2,31 +2,30 @@ spring:
   application:
     name: tht-api
 
-  spring:
-    profiles:
-      active: dev
+  profiles:
+    active: dev
 
   datasource:
     url: jdbc:postgresql://localhost:5432/tht_db
     username: postgres
     password: postgres
-    
-  jpa:
-    hibernate:
-      ddl-auto: validate
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
+
+  sql:
+    init:
+      mode: always
+
+  flyway:
+    enabled: false
 
 jwt:
   secret: super-secret-key-change-this-later
-  expiration: 3600000 # 1 jam (ms)
+  expiration: 3600000
 
 logging:
   level:
     root: INFO
     com.fadlan.tht: DEBUG
+    org.springframework.jdbc.core: DEBUG
 
 server:
   error:

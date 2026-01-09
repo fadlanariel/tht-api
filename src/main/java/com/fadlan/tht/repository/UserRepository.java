@@ -10,18 +10,28 @@ public class UserRepository {
 
     private final JdbcTemplate jdbcTemplate;
 
-    public void save(String email, String passwordHash) {
-        String sql = """
-                    INSERT INTO users (email, password)
-                    VALUES (?, ?)
-                """;
-
-        jdbcTemplate.update(sql, email, passwordHash);
-    }
-
     public boolean existsByEmail(String email) {
         String sql = "SELECT COUNT(*) FROM users WHERE email = ?";
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, email);
         return count != null && count > 0;
+    }
+
+    public Long insertUser(String email, String hashedPassword) {
+        String sql = """
+                    INSERT INTO users(email, password)
+                    VALUES (?, ?)
+                    RETURNING id
+                """;
+
+        return jdbcTemplate.queryForObject(
+                sql,
+                Long.class,
+                email,
+                hashedPassword);
+    }
+
+    public void initBalance(Long userId) {
+        String sql = "INSERT INTO balances(user_id, balance) VALUES (?, 0)";
+        jdbcTemplate.update(sql, userId);
     }
 }

@@ -39,13 +39,23 @@ public class SecurityConfig {
                 )
 
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/error").permitAll()
+                        // Auth endpoints (PUBLIC)
+                        .requestMatchers(
+                                "/registration",
+                                "/login")
+                        .permitAll()
+
+                        // Swagger (PUBLIC)
                         .requestMatchers(
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html")
                         .permitAll()
+
+                        // Error endpoint
+                        .requestMatchers("/error").permitAll()
+
+                        // Others must be authenticated
                         .anyRequest().authenticated())
 
                 .addFilterBefore(

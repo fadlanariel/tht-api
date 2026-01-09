@@ -1,7 +1,7 @@
 -- ===============================
 -- USERS
 -- ===============================
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     id BIGSERIAL PRIMARY KEY,
     email VARCHAR(100) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
@@ -11,7 +11,7 @@ CREATE TABLE users (
 -- ===============================
 -- BALANCES
 -- ===============================
-CREATE TABLE balances (
+CREATE TABLE IF NOT EXISTS balances (
     user_id BIGINT PRIMARY KEY,
     balance BIGINT NOT NULL DEFAULT 0,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -25,7 +25,7 @@ CREATE TABLE balances (
 -- ===============================
 -- TRANSACTIONS
 -- ===============================
-CREATE TABLE transactions (
+CREATE TABLE IF NOT EXISTS transactions (
     id BIGSERIAL PRIMARY KEY,
     user_id BIGINT NOT NULL,
     amount BIGINT NOT NULL,
