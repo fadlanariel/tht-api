@@ -1,12 +1,33 @@
 package com.fadlan.tht.service;
 
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.stereotype.Service;
+
+import com.fadlan.tht.dto.request.ProfileUpdateRequest;
+import com.fadlan.tht.dto.response.ProfileResponse;
+import com.fadlan.tht.repository.ProfileRepository;
+
 import java.util.Map;
 
-public interface ProfileService {
-    Map<String, Object> getProfile(String email);
+@Service
+public class ProfileService {
+    private final ProfileRepository profileRepository;
 
-    Map<String, Object> updateProfile(String email, String firstName, String lastName);
+    public ProfileService(ProfileRepository profileRepository) {
+        this.profileRepository = profileRepository;
+    }
 
-    Map<String, Object> uploadProfileImage(String email, MultipartFile file) throws Exception;
+    public ProfileResponse getProfile(String email) {
+        return profileRepository.getProfileByEmail(email);
+    }
+
+    public ProfileResponse updateProfile(String email, ProfileUpdateRequest request) {
+        profileRepository.updateProfile(email, request.getFirstName(), request.getLastName());
+        return getProfile(email);
+    }
+
+    public ProfileResponse updateProfileImage(String email, String imageUrl) {
+        Long userId = profileRepository.getUserIdByEmail(email);
+        profileRepository.updateProfileImage(userId, imageUrl);
+        return getProfile(email);
+    }
 }

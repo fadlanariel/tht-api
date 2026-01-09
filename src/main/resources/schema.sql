@@ -7,9 +7,23 @@ CREATE TABLE IF NOT EXISTS users (
     password VARCHAR(255) NOT NULL,
     first_name VARCHAR(50),
     last_name VARCHAR(50),
-    profile_image VARCHAR(255),
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+-- ===============================
+-- PROFILE_IMAGES
+-- ===============================
+CREATE TABLE IF NOT EXISTS profile_images (
+    user_id BIGINT PRIMARY KEY,
+    profile_image VARCHAR(255),
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_profile_user
+        FOREIGN KEY (user_id)
+        REFERENCES users(id)
+        ON DELETE CASCADE
+);
+
 
 -- ===============================
 -- BALANCES
@@ -82,3 +96,4 @@ ON CONFLICT (banner_name) DO NOTHING;
 INSERT INTO banners (banner_name, banner_image, description)
 VALUES ('Banner 6', 'https://nutech-integrasi.app/dummy.jpg', 'Lerem Ipsum Dolor sit amet')
 ON CONFLICT (banner_name) DO NOTHING;
+
