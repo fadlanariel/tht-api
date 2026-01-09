@@ -13,7 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/banner")
-@Tag(name = "Information", description = "Module Banner - Public")
+@Tag(name = "Information")
 public class BannerController {
 
     private final BannerService bannerService;

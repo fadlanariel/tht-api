@@ -14,13 +14,12 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/registration")
 @Tag(name = "Membership", description = "Module untuk registrasi, login, dan profile user")
 public class AuthController {
 
     private final AuthService authService;
 
-    @PostMapping
+    @PostMapping("/registration")
     public ResponseEntity<RegisterResponse> register(
             @Valid @RequestBody RegisterRequest request) {
         authService.register(request);

@@ -1,33 +1,34 @@
 package com.fadlan.tht.security;
 
-import io.jsonwebtoken.Claims;
+import com.fadlan.tht.util.JwtTokenUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-
 import java.io.IOException;
 import java.util.List;
-import java.util.UUID;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtService jwtService;
+    private final JwtTokenUtil jwtTokenUtil;
 
-    public JwtAuthenticationFilter(JwtService jwtService) {
-        this.jwtService = jwtService;
+    public JwtAuthenticationFilter(JwtTokenUtil jwtTokenUtil) {
+        this.jwtTokenUtil = jwtTokenUtil;
     }
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        return request.getServletPath().startsWith("/api/auth");
+        return request.getServletPath().startsWith("/registration")
+                || request.getServletPath().startsWith("/login")
+                || request.getServletPath().startsWith("/banner")
+                || request.getServletPath().startsWith("/swagger");
     }
 
     @Override
@@ -44,26 +45,28 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        String token = authHeader.substring(7);
-
         try {
-            Claims claims = jwtService.extractClaims(token);
+            if (!jwtTokenUtil.validateToken(authHeader)) {
+                throw new RuntimeException("Invalid token");
+            }
 
-            UUID userId = UUID.fromString(claims.get("userId", String.class));
-            String email = claims.get("email", String.class);
+            String email = jwtTokenUtil.getEmailFromToken(authHeader);
 
-            AuthenticatedUser principal = new AuthenticatedUser(userId, email);
-
+            // set Authentication ke context
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                    principal,
+                    email, // principal = email
                     null,
-                    List.of(new SimpleGrantedAuthority("ROLE_USER"))
-            );
+                    List.of(new SimpleGrantedAuthority("ROLE_USER")));
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
         } catch (Exception e) {
             SecurityContextHolder.clearContext();
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.getWriter()
+                    .write("{\"status\":108,\"message\":\"Token tidak valid atau kadaluwarsa\",\"data\":null}");
+            return;
         }
 
         filterChain.doFilter(request, response);

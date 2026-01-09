@@ -97,3 +97,60 @@ INSERT INTO banners (banner_name, banner_image, description)
 VALUES ('Banner 6', 'https://nutech-integrasi.app/dummy.jpg', 'Lerem Ipsum Dolor sit amet')
 ON CONFLICT (banner_name) DO NOTHING;
 
+-- ===============================
+-- SERVICES
+-- ===============================
+CREATE TABLE IF NOT EXISTS services (
+    service_code VARCHAR(50) PRIMARY KEY,
+    service_name VARCHAR(100) NOT NULL,
+    service_icon VARCHAR(255),
+    service_tariff BIGINT NOT NULL
+);
+
+INSERT INTO services(service_code, service_name, service_icon, service_tariff) VALUES
+('PAJAK', 'Pajak PBB', 'https://nutech-integrasi.app/dummy.jpg', 40000)
+ON CONFLICT (service_code) DO NOTHING;
+
+INSERT INTO services(service_code, service_name, service_icon, service_tariff) VALUES
+('PLN', 'Listrik', 'https://nutech-integrasi.app/dummy.jpg', 10000)
+ON CONFLICT (service_code) DO NOTHING;
+
+INSERT INTO services(service_code, service_name, service_icon, service_tariff) VALUES
+('PDAM', 'PDAM Berlangganan', 'https://nutech-integrasi.app/dummy.jpg', 40000)
+ON CONFLICT (service_code) DO NOTHING;
+
+INSERT INTO services(service_code, service_name, service_icon, service_tariff) VALUES
+('PULSA', 'Pulsa', 'https://nutech-integrasi.app/dummy.jpg', 40000)
+ON CONFLICT (service_code) DO NOTHING;
+
+INSERT INTO services(service_code, service_name, service_icon, service_tariff) VALUES
+('PGN', 'PGN Berlangganan', 'https://nutech-integrasi.app/dummy.jpg', 50000)
+ON CONFLICT (service_code) DO NOTHING;
+
+INSERT INTO services(service_code, service_name, service_icon, service_tariff) VALUES
+('MUSIK', 'Musik Berlangganan', 'https://nutech-integrasi.app/dummy.jpg', 50000)
+ON CONFLICT (service_code) DO NOTHING;
+
+INSERT INTO services(service_code, service_name, service_icon, service_tariff) VALUES
+('TV', 'TV Berlangganan', 'https://nutech-integrasi.app/dummy.jpg', 50000)
+ON CONFLICT (service_code) DO NOTHING;
+
+INSERT INTO services(service_code, service_name, service_icon, service_tariff) VALUES
+('PAKET_DATA', 'Paket data', 'https://nutech-integrasi.app/dummy.jpg', 50000)
+ON CONFLICT (service_code) DO NOTHING;
+
+INSERT INTO services(service_code, service_name, service_icon, service_tariff) VALUES
+('VOUCHER_GAME', 'Voucher Game', 'https://nutech-integrasi.app/dummy.jpg', 100000)
+ON CONFLICT (service_code) DO NOTHING;
+
+INSERT INTO services(service_code, service_name, service_icon, service_tariff) VALUES
+('VOUCHER_MAKANAN', 'Voucher Makanan', 'https://nutech-integrasi.app/dummy.jpg', 100000)
+ON CONFLICT (service_code) DO NOTHING;
+
+INSERT INTO services(service_code, service_name, service_icon, service_tariff) VALUES
+('QURBAN', 'Qurban', 'https://nutech-integrasi.app/dummy.jpg', 200000)
+ON CONFLICT (service_code) DO NOTHING;
+
+INSERT INTO services(service_code, service_name, service_icon, service_tariff) VALUES
+('ZAKAT', 'Zakat', 'https://nutech-integrasi.app/dummy.jpg', 300000)
+ON CONFLICT (service_code) DO NOTHING;
