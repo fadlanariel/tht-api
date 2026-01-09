@@ -41,7 +41,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Auth endpoints (PUBLIC)
                         .requestMatchers(
-                                "/registration",
+                                "/**",
                                 "/login")
                         .permitAll()
 

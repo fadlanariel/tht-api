@@ -1,8 +1,14 @@
 package com.fadlan.tht.repository;
 
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+
+import com.fadlan.tht.dto.UserDto;
 
 @Repository
 @RequiredArgsConstructor
@@ -33,5 +39,33 @@ public class UserRepository {
     public void initBalance(Long userId) {
         String sql = "INSERT INTO balances(user_id, balance) VALUES (?, 0)";
         jdbcTemplate.update(sql, userId);
+    }
+
+    public Optional<UserDto> findByEmail(String email) {
+        String sql = """
+            SELECT id, email, password
+            FROM users
+            WHERE email = ?
+        """;
+
+        List<UserDto> result = jdbcTemplate.query(
+                sql,
+                (rs, rowNum) -> new UserDto(
+                        rs.getLong("id"),
+                        rs.getString("email"),
+                        rs.getString("password")
+                ),
+                email
+        );
+
+        return result.stream().findFirst();
+    }
+
+    public void save(String email, String password) {
+        String sql = """
+                    INSERT INTO users (email, password)
+                    VALUES (?, ?)
+                """;
+        jdbcTemplate.update(sql, email, password);
     }
 }

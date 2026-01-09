@@ -1,6 +1,8 @@
 package com.fadlan.tht.controller;
 
+import com.fadlan.tht.dto.request.LoginRequest;
 import com.fadlan.tht.dto.request.RegisterRequest;
+import com.fadlan.tht.dto.response.LoginResponse;
 import com.fadlan.tht.dto.response.RegisterResponse;
 import com.fadlan.tht.service.AuthService;
 import jakarta.validation.Valid;
@@ -21,5 +23,10 @@ public class AuthController {
         authService.register(request);
         return ResponseEntity.ok(
                 new RegisterResponse("Registration successful"));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
+        return ResponseEntity.ok(authService.login(request));
     }
 }
