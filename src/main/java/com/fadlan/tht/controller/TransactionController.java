@@ -43,17 +43,18 @@ public class TransactionController {
                     "status", 0,
                     "message", "Transaksi berhasil",
                     "data", transaction));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "status", 102,
-                    "message", e.getMessage(),
-                    "data", null));
         } catch (InsufficientBalanceException e) {
             return ResponseEntity.badRequest().body(Map.of(
                     "status", 103,
                     "message", e.getMessage(),
                     "data", null));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "status", 102,
+                    "message", e.getMessage(),
+                    "data", null));
         }
+
     }
 
     @GetMapping("/history")

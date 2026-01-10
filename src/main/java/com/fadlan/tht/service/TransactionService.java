@@ -35,7 +35,7 @@ public class TransactionService {
                 .orElse(0L);
 
         if (currentBalance < service.getServiceTariff()) {
-            throw new InsufficientBalanceException("Saldo tidak mencukupi");
+            throw new InsufficientBalanceException();
         }
 
         balanceRepository.updateBalance(userId, -service.getServiceTariff());
