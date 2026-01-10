@@ -1,39 +1,41 @@
 package com.fadlan.tht.repository;
 
 import com.fadlan.tht.dto.ServiceDto;
+import lombok.RequiredArgsConstructor;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import javax.sql.DataSource;
-import java.sql.*;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
+@RequiredArgsConstructor
 public class ServiceRepository {
 
-    private final DataSource dataSource;
+    private final JdbcTemplate jdbcTemplate;
 
-    public ServiceRepository(DataSource dataSource) {
-        this.dataSource = dataSource;
-    }
-
-    public List<ServiceDto> findAllServices() throws SQLException {
+    public List<ServiceDto> findAllServices() {
         String sql = "SELECT service_code, service_name, service_icon, service_tariff FROM services";
-        List<ServiceDto> services = new ArrayList<>();
 
-        try (Connection conn = dataSource.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql);
-                ResultSet rs = ps.executeQuery()) {
-
-            while (rs.next()) {
-                services.add(new ServiceDto(
+        return jdbcTemplate.query(
+                sql,
+                (rs, rowNum) -> new ServiceDto(
                         rs.getString("service_code"),
                         rs.getString("service_name"),
                         rs.getString("service_icon"),
                         rs.getLong("service_tariff")));
-            }
-        }
+    }
 
-        return services;
+    public Optional<ServiceDto> findByCode(String serviceCode) {
+        String sql = "SELECT service_code, service_name, service_icon, service_tariff FROM services WHERE service_code = ?";
+        List<ServiceDto> result = jdbcTemplate.query(
+                sql,
+                (rs, rowNum) -> new ServiceDto(
+                        rs.getString("service_code"),
+                        rs.getString("service_name"),
+                        rs.getString("service_icon"),
+                        rs.getLong("service_tariff")),
+                serviceCode);
+        return result.stream().findFirst();
     }
 }
