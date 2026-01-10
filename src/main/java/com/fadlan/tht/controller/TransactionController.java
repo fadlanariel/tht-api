@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fadlan.tht.dto.TransactionDto;
 import com.fadlan.tht.dto.request.TransactionRequest;
+import com.fadlan.tht.dto.response.ApiResponse;
+import com.fadlan.tht.dto.response.TransactionHistoryResponse;
 import com.fadlan.tht.dto.response.TransactionResponse;
 import com.fadlan.tht.exception.InsufficientBalanceException;
 import com.fadlan.tht.security.AuthenticatedUser;
@@ -32,50 +34,38 @@ public class TransactionController {
     private final TransactionService transactionService;
 
     @PostMapping
-    public ResponseEntity<Map<String, Object>> createTransaction(@RequestBody TransactionRequest request) {
+    public ResponseEntity<ApiResponse<TransactionResponse>> createTransaction(
+            @RequestBody TransactionRequest request) {
+
         AuthenticatedUser currentUser = SecurityUtils.getCurrentUser();
 
-        try {
-            TransactionResponse transaction = transactionService.processTransaction(currentUser.getId(),
-                    request.serviceCode());
+        TransactionResponse transaction = transactionService.processTransaction(currentUser.getId(),
+                request.serviceCode());
 
-            return ResponseEntity.ok(Map.of(
-                    "status", 0,
-                    "message", "Transaksi berhasil",
-                    "data", transaction));
-        } catch (InsufficientBalanceException e) {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "status", 103,
-                    "message", e.getMessage(),
-                    "data", null));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "status", 102,
-                    "message", e.getMessage(),
-                    "data", null));
-        }
-
+        return ResponseEntity.ok(
+                new ApiResponse<>(0, "Transaksi berhasil", transaction));
     }
 
     @GetMapping("/history")
-    public ResponseEntity<Map<String, Object>> getTransactionHistory(
-            @RequestParam(required = false) Integer limit,
-            @RequestParam(required = false) Integer offset) {
+    public ResponseEntity<ApiResponse<TransactionHistoryResponse>> getTransactionHistory(
+            @RequestParam(defaultValue = "0") int offset,
+            @RequestParam(defaultValue = "10") int limit) {
 
         AuthenticatedUser currentUser = SecurityUtils.getCurrentUser();
         long userId = currentUser.getId();
 
-        List<TransactionDto> history = transactionService.getTransactionHistory(userId, limit, offset);
+        List<TransactionDto> history =
+                transactionService.getTransactionHistory(userId, offset, limit);
 
-        Map<String, Object> data = new HashMap<>();
-        data.put("offset", offset != null ? offset : 0);
-        data.put("limit", limit != null ? limit : history.size());
-        data.put("records", history);
+        TransactionHistoryResponse data = new TransactionHistoryResponse(
+                offset,
+                limit,
+                history
+        );
 
-        return ResponseEntity.ok(Map.of(
-                "status", 0,
-                "message", "Get History Berhasil",
-                "data", data
-        ));
+        return ResponseEntity.ok(
+                new ApiResponse<>(0, "Get History Berhasil", data)
+        );
     }
+
 }
