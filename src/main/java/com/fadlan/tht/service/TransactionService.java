@@ -1,12 +1,15 @@
 package com.fadlan.tht.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fadlan.tht.dto.ServiceDto;
+import com.fadlan.tht.dto.TransactionDto;
 import com.fadlan.tht.dto.response.TransactionResponse;
 import com.fadlan.tht.exception.InsufficientBalanceException;
 import com.fadlan.tht.repository.BalanceRepository;
@@ -25,11 +28,9 @@ public class TransactionService {
 
     @Transactional
     public TransactionResponse processTransaction(Long userId, String serviceCode) {
-        // cek service
         ServiceDto service = serviceRepository.findByCode(serviceCode)
                 .orElseThrow(() -> new IllegalArgumentException("Service atau Layanan tidak ditemukan"));
 
-        // cek saldo
         Long currentBalance = balanceRepository.findByUserId(userId)
                 .orElse(0L);
 
@@ -37,17 +38,17 @@ public class TransactionService {
             throw new InsufficientBalanceException("Saldo tidak mencukupi");
         }
 
-        // update balance
         balanceRepository.updateBalance(userId, -service.getServiceTariff());
 
-        // generate invoice_number
         String invoiceNumber = "INV" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")) + "-"
                 + userId;
 
-        // insert transaksi (only user_id, amount, type)
-        transactionRepository.saveTransaction(userId, service.getServiceTariff(), "PAYMENT");
+        transactionRepository.insertPayment(
+                userId,
+                invoiceNumber,
+                service.getServiceName(), // ini akan masuk ke description
+                service.getServiceTariff());
 
-        // prepare response
         TransactionResponse response = new TransactionResponse();
         response.setInvoiceNumber(invoiceNumber);
         response.setServiceCode(service.getServiceCode());
@@ -57,5 +58,9 @@ public class TransactionService {
         response.setCreatedOn(LocalDateTime.now());
 
         return response;
+    }
+
+    public List<TransactionDto> getTransactionHistory(Long userId, int offset, int limit) {
+        return transactionRepository.findHistoryByUserId(userId, offset, limit);
     }
 }

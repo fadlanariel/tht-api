@@ -45,8 +45,10 @@ CREATE TABLE IF NOT EXISTS balances (
 CREATE TABLE IF NOT EXISTS transactions (
     id BIGSERIAL PRIMARY KEY,
     user_id BIGINT NOT NULL,
+    invoice_number VARCHAR(50) NOT NULL,
+    transaction_type VARCHAR(20) NOT NULL,
+    description VARCHAR(255),
     amount BIGINT NOT NULL,
-    type VARCHAR(20) NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT fk_transaction_user

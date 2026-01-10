@@ -1,11 +1,12 @@
 package com.fadlan.tht.service;
 
-import com.fadlan.tht.dto.UserDto;
 import com.fadlan.tht.repository.BalanceRepository;
 import com.fadlan.tht.repository.TransactionRepository;
-import com.fadlan.tht.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,13 +25,13 @@ public class BalanceService {
 
     @Transactional
     public Long topUpBalance(Long userId, Long amount) {
-        // update balance
         balanceRepository.updateBalance(userId, amount);
 
-        // simpan transaksi
-        transactionRepository.saveTransaction(userId, amount, "TOPUP");
+        String invoiceNumber = "INV" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")) + "-" + userId;
 
-        // return new balance
+        transactionRepository.insertTopup(userId, invoiceNumber, amount);
+
         return getBalanceByUserId(userId);
     }
+
 }

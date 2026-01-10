@@ -24,6 +24,11 @@ public class BalanceRepository {
         return result.stream().findFirst();
     }
 
+    public Long getBalanceByUserId(Long userId) {
+        String sql = "SELECT balance FROM balances WHERE user_id = ?";
+        return jdbcTemplate.queryForObject(sql, Long.class, userId);
+    }
+
     public void updateBalance(Long userId, Long amount) {
         String sql = "UPDATE balances SET balance = balance + ?, updated_at = CURRENT_TIMESTAMP WHERE user_id = ?";
         jdbcTemplate.update(sql, amount, userId);
