@@ -16,7 +16,7 @@ public class OpenApiConfig {
     public OpenAPI thtApiOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("THT API")
+                        .title("PAYMENT API")
                         .version("v1.0.0"))
                 .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
                 .components(new Components()

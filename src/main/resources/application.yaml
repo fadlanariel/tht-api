@@ -37,3 +37,6 @@ server:
     include-binding-errors: always
     include-stacktrace: never
     include-exception: false
+
+  forward-headers-strategy: framework
+
