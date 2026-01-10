@@ -2,6 +2,8 @@ package com.fadlan.tht.controller;
 
 import com.fadlan.tht.dto.request.ProfileUpdateRequest;
 import com.fadlan.tht.dto.response.ProfileResponse;
+import com.fadlan.tht.security.AuthenticatedUser;
+import com.fadlan.tht.security.SecurityUtils;
 import com.fadlan.tht.service.ProfileService;
 import com.fadlan.tht.util.JwtTokenUtil;
 
@@ -25,18 +27,17 @@ import java.util.Map;
 public class ProfileController {
 
     private final ProfileService profileService;
-    private final JwtTokenUtil jwtUtil; // untuk extract email dari JWT
 
-    public ProfileController(ProfileService profileService, JwtTokenUtil jwtUtil) {
+    public ProfileController(ProfileService profileService) {
         this.profileService = profileService;
-        this.jwtUtil = jwtUtil;
     }
 
     @GetMapping
     @Operation(summary = "Get Profile", description = "API Profile Private (memerlukan Token)")
-    public ResponseEntity<Map<String, Object>> getProfile(@RequestHeader("Authorization") String token) {
-        String email = jwtUtil.getEmailFromToken(token);
-        ProfileResponse profile = profileService.getProfile(email);
+    public ResponseEntity<Map<String, Object>> getProfile() {
+        AuthenticatedUser currentUser = SecurityUtils.getCurrentUser();
+
+        ProfileResponse profile = profileService.getProfile(currentUser.getEmail());
         return ResponseEntity.ok(Map.of(
                 "status", 0,
                 "message", "Sukses",
@@ -46,10 +47,9 @@ public class ProfileController {
     @PutMapping("/update")
     @Operation(summary = "Update Profile", description = "Update first_name dan last_name")
     public ResponseEntity<Map<String, Object>> updateProfile(
-            @RequestHeader("Authorization") String token,
             @RequestBody ProfileUpdateRequest request) {
-        String email = jwtUtil.getEmailFromToken(token);
-        ProfileResponse profile = profileService.updateProfile(email, request);
+        AuthenticatedUser currentUser = SecurityUtils.getCurrentUser();
+        ProfileResponse profile = profileService.updateProfile(currentUser.getEmail(), request);
         return ResponseEntity.ok(Map.of(
                 "status", 0,
                 "message", "Update Profile berhasil",
@@ -59,11 +59,11 @@ public class ProfileController {
     @PutMapping(value = "/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Upload Profile Image", description = "Upload/Update profile image")
     public ResponseEntity<Map<String, Object>> uploadProfileImage(
-            @RequestHeader("Authorization") String token,
             @Parameter(description = "Pilih file image (jpeg/png)") 
             @RequestParam("file") MultipartFile file
     ) throws IOException {
-        String email = jwtUtil.getEmailFromToken(token);
+        AuthenticatedUser currentUser = SecurityUtils.getCurrentUser();
+        String email = currentUser.getEmail();
 
         // Validasi file type
         String contentType = file.getContentType();
