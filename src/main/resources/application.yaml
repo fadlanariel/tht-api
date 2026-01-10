@@ -6,9 +6,10 @@ spring:
     active: dev
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/tht_db
-    username: postgres
-    password: postgres
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/tht_db}
+    username: ${DATABASE_USERNAME:postgres}
+    password: ${DATABASE_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
 
   sql:
     init:
