@@ -5,6 +5,7 @@ import com.fadlan.tht.dto.request.LoginRequest;
 import com.fadlan.tht.dto.request.RegisterRequest;
 import com.fadlan.tht.dto.response.LoginResponse;
 import com.fadlan.tht.exception.ApiException;
+import com.fadlan.tht.repository.BalanceRepository;
 import com.fadlan.tht.repository.UserRepository;
 import com.fadlan.tht.security.JwtTokenProvider;
 
@@ -27,8 +28,14 @@ public class AuthService {
             throw new ApiException("Email already registered");
         }
 
+        // Hash password
         String hashedPassword = passwordEncoder.encode(request.getPassword());
-        userRepository.save(request.getEmail(), hashedPassword);
+
+        // Simpan user dan ambil userId
+        Long userId = userRepository.save(request.getEmail(), hashedPassword);
+
+        // Buat balance awal 0 untuk user baru
+        userRepository.initBalance(userId);
     }
 
     public LoginResponse login(LoginRequest request) {

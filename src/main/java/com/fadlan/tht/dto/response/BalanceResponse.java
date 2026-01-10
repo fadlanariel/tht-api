@@ -1,0 +1,5 @@
+package com.fadlan.tht.dto.response;
+
+public record BalanceResponse(
+        Long balance) {
+}

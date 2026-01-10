@@ -8,6 +8,6 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class AuthenticatedUser {
-    private UUID id;
+    private Long id;
     private String email;
 }

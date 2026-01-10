@@ -2,10 +2,13 @@ package com.fadlan.tht.repository;
 
 import lombok.RequiredArgsConstructor;
 
+import java.sql.PreparedStatement;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import com.fadlan.tht.dto.UserDto;
@@ -61,11 +64,26 @@ public class UserRepository {
         return result.stream().findFirst();
     }
 
-    public void save(String email, String password) {
+    public Long save(String email, String password) {
         String sql = """
-                    INSERT INTO users (email, password)
-                    VALUES (?, ?)
+                INSERT INTO users (email, password)
+                VALUES (?, ?)
                 """;
-        jdbcTemplate.update(sql, email, password);
+
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+
+        jdbcTemplate.update(connection -> {
+            PreparedStatement ps = connection.prepareStatement(sql, new String[]{"id"});
+            ps.setString(1, email);
+            ps.setString(2, password);
+            return ps;
+        }, keyHolder);
+
+        Number key = keyHolder.getKey();
+        if (key != null) {
+            return key.longValue(); // userId sebagai Long, cocok untuk BIGINT
+        } else {
+            throw new RuntimeException("Failed to retrieve generated user ID");
+        }
     }
 }
